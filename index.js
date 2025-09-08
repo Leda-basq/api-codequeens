@@ -34,15 +34,48 @@ app.post("/pessoas", (req, res) => {
 });
 
 //rota: http://localhost:3000/pessoas/2
-app.get("/pessoa/:id", (req,res) =>{
-    const id = parseInt(req.params.id);
-    const pessoa = pessoas.find(u => u.id === id);
+app.get("/pessoa/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const pessoa = pessoas.find((u) => u.id === id);
 
-    if(!pessoa) {
-        return res.status(404).json({ error: "Usuário não encontrado"});
-    }
+  if (!pessoa) {
+    return res.status(404).json({ error: "Usuário não encontrado" });
+  }
 
-    res.json(pessoa);
+  res.json(pessoa);
+});
+
+app.put("/pessoa/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const pessoa = pessoas.find((u) => u.id === id);
+
+  if (!pessoa) {
+    return res.status(404).json({ error: "Usuário não encontrado" });
+  }
+
+  // const {id, nome, idade, cor } = req.body;
+  const novaPessoa = req.body;
+  console.log("pessoa antiga: ", pessoa);
+  console.log("pessoa nova: ", { id: pessoa.id, ...novaPessoa });
+
+  pessoas[pessoa.id - 1] = { ...novaPessoa, id: pessoa.id };
+
+  console.log("pessoas: ", pessoas);
+  res.json(pessoas);
+});
+
+app.delete("/deletePessoa/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const pessoa = pessoas.find((u) => u.id === id);
+
+  if (!pessoa) {
+    return res.status(404).json({ error: "Usuário não encontrado" });
+  }
+
+ pessoas.splice(pessoa.id -1 ,1);
+  console.log(pessoas);
+  res.json(pessoas);
+
 });
 
 const PORT = 3000;
