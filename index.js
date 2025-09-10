@@ -72,10 +72,106 @@ app.delete("/deletePessoa/:id", (req, res) => {
     return res.status(404).json({ error: "Usuário não encontrado" });
   }
 
- pessoas.splice(pessoa.id -1 ,1);
+  pessoas.splice(pessoa.id - 1, 1);
   console.log(pessoas);
   res.json(pessoas);
+});
 
+app.get("/totalpessoas", (req, res) => {
+  console.log("requisição:", req);
+  console.log("\nresponse:", res);
+  res.json(pessoas.length);
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+let doces = [
+  { id: 1, nome: "brigadeiro", peso: "14g", formato: "bola", validade: 2026 },
+  {
+    id: 2,
+    nome: "bolo de morango",
+    peso: "500g",
+    formato: "retangular",
+    validade: 2026,
+  },
+  { id: 3, nome: "cookie", peso: "70g", formato: "redondo", validade: 2026 },
+  {
+    id: 4,
+    nome: "gelatina",
+    peso: "300g",
+    formato: "retangular",
+    validade: 2026,
+  },
+  {
+    id: 5,
+    nome: "croissant",
+    peso: "100g",
+    formato: "meia lua",
+    validade: 2026,
+  },
+];
+
+app.get("/doces", (req, res) => {
+  if(doces.length === 0){
+    return res.status(404).json({status:404, error: "NOT_FOUND", message: 'informações não encontradas'});
+  }
+  res.json(doces);
+});
+
+app.get("/doces/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const doce = doces.find((u) => u.id === id);
+
+  if (!doce) {
+    return res.status(404).json({ status:404, error: "NOT_FOUND", message: 'informações não encontradas'});
+  }
+
+  res.json(doce);
+});
+
+app.put("/doces/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const doce = doces.find((u) => u.id === id);
+
+  if (!doce) {
+    return res.status(404).json({ status:404, error: "NOT_FOUND", message: 'informações não encontradas' });
+  }
+
+  const novoDoce = req.body;
+  console.log("Doce antigo: ", doce);
+  console.log("Doce novo: ", { id: doce.id, ...novoDoce });
+
+  doce.nome=novoDoce.nome || doce.nome
+  doce.peso=novoDoce.peso || doce.peso
+  doce.formato=novoDoce.formato || doce.formato
+  doce.validade=novoDoce.validade || doce.validade
+
+  doces[doce.id - 1] = { ...doce, id: doce.id };
+
+  console.log("doces: ", doces);
+  res.json(doces);
+});
+
+app.post("/doces", (req, res) => {
+  const { nome, peso, formato, validade } = req.body;
+  const novoDoce = { id: doces.length + 1, nome, peso, formato, validade };
+  console.log(doces.length + 1);
+  console.log("Novos dados: ", novoDoce);
+  pessoas.push(novoDoce);
+  res.status(201).json(novoDoce); // 201 = código de criação com sucesso
+});
+
+app.delete("/doces/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const doce = doces.find((u) => u.id === id);
+
+  if (!doce) {
+    return res.status(404).json({ status:404, error: "NOT_FOUND", message: 'informações não encontradas' });
+  }
+
+  doces.splice(doce.id - 1, 1);
+  console.log(doces);
+  res.json(doces);
 });
 
 const PORT = 3000;
