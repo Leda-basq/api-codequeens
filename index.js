@@ -1,19 +1,22 @@
 const express = require("express");
+const path = require('path')
 const { get } = require("http");
 const app = express();
+
+const publicDir = path.join(__dirname, './')
 
 app.use(express.json());
 
 let pessoas = [
-  { id: 1, nome: "leda", idade: 13, cor: "rosa" },
-  { id: 2, nome: "valentina", idade: 13, cor: "roxo" },
-  { id: 3, nome: "ana luiza", idade: 13, cor: "rosa" },
-  { id: 4, nome: "filipe", idade: 16, cor: "preto" },
-  { id: 5, nome: "agatha", idade: 13, cor: "vermelho" },
+  { id: 1, nome: "leda", login: "admin", senha: 123, idade: 13, cor: "rosa" },
+  { id: 2, nome: "valentina", login: "admin2", senha: 123, idade: 13, cor: "roxo" },
+  { id: 3, nome: "ana luiza",login: "admin3", senha: 123, idade: 13, cor: "rosa" },
+  { id: 4, nome: "filipe", login: "admin4", senha: 123, idade: 16, cor: "preto" },
+  { id: 5, nome: "agatha", login: "admin5", senha: 123, idade: 13, cor: "vermelho" },
 ];
 
 app.get("/", (reg, res) => {
-  res.json({ mensagem: "API de pessoas funcionando" });
+ res.sendFile(path.join(publicDir, "itens.html"));
 });
 
 app.get("/pessoas", (reg, res) => {
@@ -83,8 +86,7 @@ app.get("/totalpessoas", (req, res) => {
   res.json(pessoas.length);
 });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 let doces = [
   { id: 1, nome: "brigadeiro", peso: "14g", formato: "bola", validade: 2026 },
   {
@@ -112,8 +114,14 @@ let doces = [
 ];
 
 app.get("/doces", (req, res) => {
-  if(doces.length === 0){
-    return res.status(404).json({status:404, error: "NOT_FOUND", message: 'informações não encontradas'});
+  if (doces.length === 0) {
+    return res
+      .status(404)
+      .json({
+        status: 404,
+        error: "NOT_FOUND",
+        message: "informações não encontradas",
+      });
   }
   res.json(doces);
 });
@@ -123,7 +131,13 @@ app.get("/doces/:id", (req, res) => {
   const doce = doces.find((u) => u.id === id);
 
   if (!doce) {
-    return res.status(404).json({ status:404, error: "NOT_FOUND", message: 'informações não encontradas'});
+    return res
+      .status(404)
+      .json({
+        status: 404,
+        error: "NOT_FOUND",
+        message: "informações não encontradas",
+      });
   }
 
   res.json(doce);
@@ -134,17 +148,23 @@ app.put("/doces/:id", (req, res) => {
   const doce = doces.find((u) => u.id === id);
 
   if (!doce) {
-    return res.status(404).json({ status:404, error: "NOT_FOUND", message: 'informações não encontradas' });
+    return res
+      .status(404)
+      .json({
+        status: 404,
+        error: "NOT_FOUND",
+        message: "informações não encontradas",
+      });
   }
 
   const novoDoce = req.body;
   console.log("Doce antigo: ", doce);
   console.log("Doce novo: ", { id: doce.id, ...novoDoce });
 
-  doce.nome=novoDoce.nome || doce.nome
-  doce.peso=novoDoce.peso || doce.peso
-  doce.formato=novoDoce.formato || doce.formato
-  doce.validade=novoDoce.validade || doce.validade
+  doce.nome = novoDoce.nome || doce.nome;
+  doce.peso = novoDoce.peso || doce.peso;
+  doce.formato = novoDoce.formato || doce.formato;
+  doce.validade = novoDoce.validade || doce.validade;
 
   doces[doce.id - 1] = { ...doce, id: doce.id };
 
@@ -166,12 +186,40 @@ app.delete("/doces/:id", (req, res) => {
   const doce = doces.find((u) => u.id === id);
 
   if (!doce) {
-    return res.status(404).json({ status:404, error: "NOT_FOUND", message: 'informações não encontradas' });
+    return res
+      .status(404)
+      .json({
+        status: 404,
+        error: "NOT_FOUND",
+        message: "informações não encontradas",
+      });
   }
 
   doces.splice(doce.id - 1, 1);
   console.log(doces);
   res.json(doces);
+});
+*/
+
+// Aula 15/09 - novos endpoints sobre o array pessoas
+
+app.post('/login', (req,res) => {
+  const {login, senha} = req.body
+
+  if(!login || !senha){
+    res.status(404).json({status:404, message: "Requisição inválida"})
+  }
+
+  const usuario = pessoas.find((p) => p.login === login)
+  if (!usuario){
+    res.status(404).json({status:404, message: "Usuário não encontrado"})
+  }
+
+  if (usuario.senha!= senha){
+    res.status(404).json({status:404, message: "Senha inválida"})
+  }
+
+  res.status(200).json({status:200, message: "Login co  sucesso"})
 });
 
 const PORT = 3000;
